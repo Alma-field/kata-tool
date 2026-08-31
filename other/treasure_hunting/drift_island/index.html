@@ -6,6 +6,7 @@
 切り替わらない場合は <a id="redirect-link" href="../" data-astro-cid-zjg6v2vq>トップページ</a> を押してください。
 </p> </section> </main> <script>(function(){const target = "/treasure_hunting/drift_island/";
 const fallbackHref = "../";
+const baseUrl = "/kata-tool/";
 
       const messageElement = document.getElementById('redirect-message');
       const linkElement = document.getElementById('redirect-link');
@@ -29,8 +30,27 @@ const fallbackHref = "../";
           return decoded;
         }
 
+        const normalizeBasePath = (basePath) => {
+          if (!basePath || basePath === '/') {
+            return '/';
+          }
+
+          return `/${basePath.replace(/^\/+|\/+$/g, '')}/`;
+        };
+
+        const resolveBaseAwarePath = (pathValue) => {
+          const normalizedPath = `/${pathValue.replace(/^\/+/, '')}`;
+          const normalizedBase = normalizeBasePath(baseUrl);
+
+          if (normalizedBase === '/' || normalizedPath.startsWith(normalizedBase)) {
+            return normalizedPath;
+          }
+
+          return `${normalizedBase.replace(/\/$/, '')}${normalizedPath}`;
+        };
+
         if (decoded.startsWith('/')) {
-          return new URL(decoded, window.location.origin).href;
+          return new URL(resolveBaseAwarePath(decoded), window.location.origin).href;
         }
 
         const currentPath = window.location.pathname.replace(/\/+$/, '/');
